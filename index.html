@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html>
+
+<body style="font-family:Arial;">
+
+<!-- TOP BAR -->
+<div style="
+    position:absolute;
+    top:10px;
+    left:1150px;
+    right:20px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+">
+
+    <div id="userStatus" style="
+        font-size:16px;
+        background:#e0e0e0;
+        padding:8px 12px;
+        border-radius:8px;
+    ">
+        Not logged in
+    </div>
+
+    <div style="display:flex; gap:10px; align-items:center;">
+
+        <button onclick="openSignup()" style="font-size:18px;padding:10px 18px;">
+            Sign Up
+        </button>
+
+        <button onclick="openLogin()" style="font-size:18px;padding:10px 18px;">
+            Log In
+        </button>
+
+        <div id="hud" style="
+            font-size:20px;
+            background:#cfcfcf;
+            padding:10px 15px;
+            border-radius:10px;
+        ">
+            Score: 0
+        </div>
+
+    </div>
+</div>
+
+<!-- POPUP -->
+<div id="popup" style="
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.6);
+    display:none;
+    justify-content:center;
+    align-items:center;
+    z-index:9999;
+">
+
+    <div style="
+        background:white;
+        padding:30px;
+        border-radius:15px;
+        width:320px;
+        text-align:center;
+    ">
+
+        <p id="popupTitle" style="font-size:26px;">Login</p>
+
+        <input id="username" placeholder="Username" style="width:90%;padding:10px;margin:5px;">
+        <input id="password" type="password" placeholder="Password" style="width:90%;padding:10px;margin:5px;">
+
+        <button id="popupButton" style="width:95%;padding:10px;margin-top:10px;" onclick="login()">
+            Login
+        </button>
+
+        <button onclick="closePopup()" style="width:95%;padding:8px;color:red;">
+            Close
+        </button>
+
+        <p id="loginText"></p>
+
+    </div>
+</div>
+
+<!-- FRAME -->
+<div id="frame" style="
+    position:absolute;
+    background:#dadada;
+    margin-left:450px;
+    margin-top:105px;
+    padding:20px;
+    width:1125px;
+    height:500px;
+">
+
+    <p class="roundScoreText">Round Score: 0</p>
+    <p id="timerText">Time: 30</p>
+
+    <div id="gameArea" style="display:none;">
+
+        <div id="content">
+            <p>Select a chapter</p>
+        </div>
+
+    </div>
+
+</div>
+
+<!-- CHAPTERS -->
+<div id="chapters" style="display:flex;flex-direction:column;margin-left:20px;">
+    <p style="font-size:35px;margin-left:20px;">Chapters</p>
+</div>
+
+<script>
+
+let currentUser = null;
+let timeLeft = 30;
+let timer = null;
+
+let roundScore = 0;
+let totalScore = 0;
+
+let currentType = "Sadd";
+let currentAnswer = 0;
+let currentLevel = 1;
+
+let gameStarted = false;
+
+/* ================= LOGIN ================= */
+
+async function login() {
+
+    let username = document.getElementById("username").value;
+    let password = document.getElementById("password").value;
+
+    let res = await fetch("http://localhost:3000/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password })
+    });
+
+    let data = await res.json();
+
+    // ❌ нет аккаунта
+    if (data.error === "no_user") {
+        document.getElementById("loginText").innerText =
+            "No Account with this Username created";
+        return;
+    }
+
+    // ❌ неправильный пароль
+    if (data.error === "wrong_password") {
+        document.getElementById("loginText").innerText =
+            "Wrong Password";
+        return;
+    }
+
+    // ✅ успех
+    if (data.success) {
+
+        currentUser = data.username;
+        totalScore = data.score;
+
+        document.getElementById("userStatus").innerText =
+            "Logged in: " + currentUser;
+
+        updateHUD();
+        closePopup();
+    }
+}
+
+function openLogin() {
+    document.getElementById("popup").style.display = "flex";
+}
+
+async function signUp() {
+
+    let username = document.getElementById("username").value;
+    let password = document.getElementById("password").value;
+
+    let res = await fetch("http://localhost:3000/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password })
+    });
+
+    let data = await res.json();
+
+    // ❌ уже существует
+    if (data.error === "exists") {
+        document.getElementById("loginText").innerText =
+            "This username is already taken";
+        return;
+    }
+
+    // ✅ создан
+    if (data.success) {
+        document.getElementById("loginText").innerText =
+            "Account Created!";
+    }
+}
+
+function closePopup() {
+    document.getElementById("popup").style.display = "none";
+}
+
+/* ================= HUD ================= */
+
+function updateHUD() {
+    document.getElementById("hud").innerText = "Score: " + totalScore;
+    document.querySelector(".roundScoreText").innerText = "Round Score: " + roundScore;
+}
+
+/* ================= GAME ================= */
+
+function rand(max){
+    return Math.floor(Math.random()*max)+1;
+}
+
+function getPoints(){
+
+    if(currentType==="Sadd") return currentLevel===1?1:currentLevel===2?4:8;
+    if(currentType==="Ssub") return currentLevel===1?1:currentLevel===2?4:8;
+    if(currentType==="Smul") return currentLevel===1?3:currentLevel===2?18:110;
+
+    return 1;
+}
+
+function getRoundTime(){
+    if(currentType==="Smul") return currentLevel===1?45:currentLevel===2?90:180;
+    return 30;
+}
+
+/* ================= CHAPTERS ================= */
+
+let chapters = [
+    {name:"Addition", type:"Sadd"},
+    {name:"Subtraction", type:"Ssub"},
+    {name:"Multiplication", type:"Smul"}
+];
+
+for(let i=0;i<chapters.length;i++){
+
+    let btn = document.createElement("button");
+    btn.innerText = chapters[i].name;
+
+    btn.style = "font-size:18px;padding:14px;width:340px;margin:10px;";
+
+    btn.onclick = function(){
+
+        currentType = chapters[i].type;
+
+        document.getElementById("gameArea").style.display = "block";
+
+        document.getElementById("content").innerHTML = `
+            <p>${chapters[i].name}</p>
+
+            <p class="eq">Press Start</p>
+
+            <button id="startBtn" onclick="startGame()">Start</button>
+
+            <input class="input" style="display:none;padding:10px;font-size:20px;">
+
+            <div>
+                <button onclick="setDifficulty(1)">1</button>
+                <button onclick="setDifficulty(2)">2</button>
+                <button onclick="setDifficulty(3)">3</button>
+            </div>
+        `;
+    }
+
+    document.getElementById("chapters").appendChild(btn);
+}
+
+/* ================= DIFFICULTY ================= */
+
+function setDifficulty(lvl){
+    currentLevel = lvl;
+    generateQuestion();
+}
+
+/* ================= START ================= */
+
+function startGame(){
+
+    if(gameStarted) return;
+
+    gameStarted = true;
+
+    timeLeft = getRoundTime();
+    roundScore = 0;
+
+    updateHUD();
+
+    document.querySelector(".input").style.display="block";
+
+    timer = setInterval(()=>{
+
+        timeLeft--;
+        document.getElementById("timerText").innerText = "Time: "+timeLeft;
+
+        if(timeLeft<=0) endGame();
+
+    },1000);
+
+    generateQuestion();
+}
+
+/* ================= END ================= */
+
+function endGame(){
+
+    clearInterval(timer);
+    gameStarted=false;
+
+    totalScore += roundScore;
+    updateHUD();
+
+    if(currentUser){
+        fetch("http://localhost:3000/saveScore",{
+            method:"POST",
+            headers:{"Content-Type":"application/json"},
+            body:JSON.stringify({username:currentUser,score:totalScore})
+        });
+    }
+}
+
+/* ================= QUESTIONS ================= */
+
+function generateQuestion(){
+
+    let eq=document.querySelector(".eq");
+    let nums=[];
+
+    if(currentLevel===1) nums=[rand(10),rand(10)];
+    if(currentLevel===2) nums=[rand(15),rand(15),rand(15)];
+    if(currentLevel===3) nums=[rand(20),rand(20),rand(20),rand(20)];
+
+    if(currentType==="Sadd"){
+        currentAnswer = nums.reduce((a,b)=>a+b,0);
+        eq.innerText = nums.join("+")+"=";
+    }
+
+    if(currentType==="Ssub"){
+        nums.sort((a,b)=>b-a);
+        currentAnswer = nums.reduce((a,b)=>a-b);
+        eq.innerText = nums.join("-")+"=";
+    }
+
+    if(currentType==="Smul"){
+        currentAnswer = nums.reduce((a,b)=>a*b,1);
+        eq.innerText = nums.join("×")+"=";
+    }
+}
+
+/* ================= INPUT ================= */
+
+document.addEventListener("keydown",(e)=>{
+
+    if(e.key==="Enter" && gameStarted){
+
+        let input=document.querySelector(".input");
+
+        if(parseInt(input.value)===currentAnswer){
+            roundScore += getPoints();
+        }
+
+        input.value="";
+        generateQuestion();
+        updateHUD();
+    }
+});
+
+</script>
+
+</body>
+</html>

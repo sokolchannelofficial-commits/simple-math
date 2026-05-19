@@ -1,9 +1,6 @@
 <!DOCTYPE html>
 <html>
 
-<body style="font-family:Arial;">
-
-
 <head>
 
     <title>Simple Math Game</title>
@@ -12,6 +9,7 @@
 
 </head>
 
+<body style="font-family:Arial;">
 
 <!-- TOP BAR -->
 <div style="
@@ -74,16 +72,28 @@
         text-align:center;
     ">
 
-        <p id="popupTitle" style="font-size:26px;">Login</p>
+        <p id="popupTitle" style="font-size:26px;">
+            Login
+        </p>
 
-        <input id="username" placeholder="Username" style="width:90%;padding:10px;margin:5px;">
-        <input id="password" type="password" placeholder="Password" style="width:90%;padding:10px;margin:5px;">
+        <input
+        id="username"
+        placeholder="Username"
+        style="width:90%;padding:10px;margin:5px;">
 
-        <<button id="popupButton" style="width:95%;padding:10px;margin-top:10px;">
+        <input
+        id="password"
+        type="password"
+        placeholder="Password"
+        style="width:90%;padding:10px;margin:5px;">
+
+        <button id="popupButton"style="width:95%;padding:10px;margin-top:10px;">
             Login
         </button>
 
-        <button onclick="closePopup()" style="width:95%;padding:8px;color:red;">
+        <button
+        onclick="closePopup()"
+        style="width:95%;padding:8px;color:red;">
             Close
         </button>
 
@@ -103,8 +113,13 @@
     height:500px;
 ">
 
-    <p class="roundScoreText">Round Score: 0</p>
-    <p id="timerText">Time: 30</p>
+    <p class="roundScoreText">
+        Round Score: 0
+    </p>
+
+    <p id="timerText">
+        Time: 30
+    </p>
 
     <div id="gameArea" style="display:none;">
 
@@ -117,13 +132,25 @@
 </div>
 
 <!-- CHAPTERS -->
-<div id="chapters" style="display:flex;flex-direction:column;margin-left:20px;">
-    <p style="font-size:35px;margin-left:20px;">Chapters</p>
+<div id="chapters" style="
+    display:flex;
+    flex-direction:column;
+    margin-left:20px;
+">
+
+    <p style="
+        font-size:35px;
+        margin-left:20px;
+    ">
+        Chapters
+    </p>
+
 </div>
 
 <script>
 
 let currentUser = null;
+
 let timeLeft = 30;
 let timer = null;
 
@@ -132,6 +159,7 @@ let totalScore = 0;
 
 let currentType = "Sadd";
 let currentAnswer = 0;
+
 let currentLevel = 1;
 
 let gameStarted = false;
@@ -140,14 +168,20 @@ let gameStarted = false;
 
 async function login() {
 
-    let username = document.getElementById("username").value;
-    let password = document.getElementById("password").value;
+    let username =
+        document.getElementById("username").value;
+
+    let password =
+        document.getElementById("password").value;
 
     let res = await fetch("/login", {
+
         method: "POST",
+
         headers: {
             "Content-Type": "application/json"
         },
+
         body: JSON.stringify({
             username,
             password
@@ -156,6 +190,7 @@ async function login() {
 
     let data = await res.json();
 
+    // NO ACCOUNT
     if (data.error === "no_user") {
 
         document.getElementById("loginText").innerText =
@@ -164,6 +199,7 @@ async function login() {
         return;
     }
 
+    // WRONG PASSWORD
     if (data.error === "wrong_password") {
 
         document.getElementById("loginText").innerText =
@@ -172,9 +208,11 @@ async function login() {
         return;
     }
 
+    // SUCCESS
     if (data.success) {
 
         currentUser = data.username;
+
         totalScore = data.score;
 
         document.getElementById("userStatus").innerText =
@@ -188,7 +226,8 @@ async function login() {
 
 function openLogin() {
 
-    document.getElementById("popup").style.display = "flex";
+    document.getElementById("popup").style.display =
+        "flex";
 
     document.getElementById("popupTitle").innerText =
         "Login";
@@ -202,9 +241,53 @@ function openLogin() {
     document.getElementById("loginText").innerText = "";
 }
 
+/* ================= SIGN UP ================= */
+
+async function signUp() {
+
+    let username =
+        document.getElementById("username").value;
+
+    let password =
+        document.getElementById("password").value;
+
+    let res = await fetch("/signup", {
+
+        method: "POST",
+
+        headers: {
+            "Content-Type": "application/json"
+        },
+
+        body: JSON.stringify({
+            username,
+            password
+        })
+    });
+
+    let data = await res.json();
+
+    // USER EXISTS
+    if (data.error === "exists") {
+
+        document.getElementById("loginText").innerText =
+            "This username is already taken";
+
+        return;
+    }
+
+    // SUCCESS
+    if (data.success) {
+
+        document.getElementById("loginText").innerText =
+            "Account Created!";
+    }
+}
+
 function openSignup() {
 
-    document.getElementById("popup").style.display = "flex";
+    document.getElementById("popup").style.display =
+        "flex";
 
     document.getElementById("popupTitle").innerText =
         "Sign Up";
@@ -218,173 +301,285 @@ function openSignup() {
     document.getElementById("loginText").innerText = "";
 }
 
+/* ================= CLOSE POPUP ================= */
+
 function closePopup() {
-    document.getElementById("popup").style.display = "none";
+
+    document.getElementById("popup").style.display =
+        "none";
 }
 
 /* ================= HUD ================= */
 
 function updateHUD() {
-    document.getElementById("hud").innerText = "Score: " + totalScore;
-    document.querySelector(".roundScoreText").innerText = "Round Score: " + roundScore;
+
+    document.getElementById("hud").innerText =
+        "Score: " + totalScore;
+
+    document.querySelector(".roundScoreText").innerText =
+        "Round Score: " + roundScore;
 }
 
 /* ================= GAME ================= */
 
-function rand(max){
-    return Math.floor(Math.random()*max)+1;
+function rand(max) {
+
+    return Math.floor(
+        Math.random() * max
+    ) + 1;
 }
 
-function getPoints(){
+function getPoints() {
 
-    if(currentType==="Sadd") return currentLevel===1?1:currentLevel===2?4:8;
-    if(currentType==="Ssub") return currentLevel===1?1:currentLevel===2?4:8;
-    if(currentType==="Smul") return currentLevel===1?3:currentLevel===2?18:110;
+    if (currentType === "Sadd")
+        return currentLevel === 1 ? 1 :
+               currentLevel === 2 ? 4 : 8;
+
+    if (currentType === "Ssub")
+        return currentLevel === 1 ? 1 :
+               currentLevel === 2 ? 4 : 8;
+
+    if (currentType === "Smul")
+        return currentLevel === 1 ? 3 :
+               currentLevel === 2 ? 18 : 110;
 
     return 1;
 }
 
-function getRoundTime(){
-    if(currentType==="Smul") return currentLevel===1?45:currentLevel===2?90:180;
+function getRoundTime() {
+
+    if (currentType === "Smul")
+        return currentLevel === 1 ? 45 :
+               currentLevel === 2 ? 90 : 180;
+
     return 30;
 }
 
 /* ================= CHAPTERS ================= */
 
 let chapters = [
-    {name:"Addition", type:"Sadd"},
-    {name:"Subtraction", type:"Ssub"},
-    {name:"Multiplication", type:"Smul"}
+
+    {
+        name:"Addition",
+        type:"Sadd"
+    },
+
+    {
+        name:"Subtraction",
+        type:"Ssub"
+    },
+
+    {
+        name:"Multiplication",
+        type:"Smul"
+    }
 ];
 
-for(let i=0;i<chapters.length;i++){
+for (let i = 0; i < chapters.length; i++) {
 
     let btn = document.createElement("button");
+
     btn.innerText = chapters[i].name;
 
-    btn.style = "font-size:18px;padding:14px;width:340px;margin:10px;";
+    btn.style =
+        "font-size:18px;padding:14px;width:340px;margin:10px;";
 
-    btn.onclick = function(){
+    btn.onclick = function() {
 
         currentType = chapters[i].type;
 
-        document.getElementById("gameArea").style.display = "block";
+        document.getElementById("gameArea").style.display =
+            "block";
 
         document.getElementById("content").innerHTML = `
+
             <p>${chapters[i].name}</p>
 
-            <p class="eq">Press Start</p>
+            <p class="eq">
+                Press Start
+            </p>
 
-            <button id="startBtn" onclick="startGame()">Start</button>
+            <button id="startBtn"
+            onclick="startGame()">
+                Start
+            </button>
 
-            <input class="input" style="display:none;padding:10px;font-size:20px;">
+            <input class="input"
+            style="
+                display:none;
+                padding:10px;
+                font-size:20px;
+            ">
 
             <div>
-                <button onclick="setDifficulty(1)">1</button>
-                <button onclick="setDifficulty(2)">2</button>
-                <button onclick="setDifficulty(3)">3</button>
+
+                <button onclick="setDifficulty(1)">
+                    1
+                </button>
+
+                <button onclick="setDifficulty(2)">
+                    2
+                </button>
+
+                <button onclick="setDifficulty(3)">
+                    3
+                </button>
+
             </div>
         `;
-    }
+    };
 
-    document.getElementById("chapters").appendChild(btn);
+    document.getElementById("chapters")
+    .appendChild(btn);
 }
 
 /* ================= DIFFICULTY ================= */
 
-function setDifficulty(lvl){
+function setDifficulty(lvl) {
+
     currentLevel = lvl;
+
     generateQuestion();
 }
 
 /* ================= START ================= */
 
-function startGame(){
+function startGame() {
 
-    if(gameStarted) return;
+    if (gameStarted)
+        return;
 
     gameStarted = true;
 
     timeLeft = getRoundTime();
+
     roundScore = 0;
 
     updateHUD();
 
-    document.querySelector(".input").style.display="block";
+    document.getElementById("timerText").innerText =
+        "Time: " + timeLeft;
 
-    timer = setInterval(()=>{
+    document.querySelector(".input").style.display =
+        "block";
+
+    timer = setInterval(() => {
 
         timeLeft--;
-        document.getElementById("timerText").innerText = "Time: "+timeLeft;
 
-        if(timeLeft<=0) endGame();
+        document.getElementById("timerText").innerText =
+            "Time: " + timeLeft;
 
-    },1000);
+        if (timeLeft <= 0)
+            endGame();
+
+    }, 1000);
 
     generateQuestion();
 }
 
 /* ================= END ================= */
 
-function endGame(){
+function endGame() {
 
     clearInterval(timer);
-    gameStarted=false;
+
+    gameStarted = false;
 
     totalScore += roundScore;
+
     updateHUD();
 
-    if(currentUser){
-        fetch("",{
+    if (currentUser) {
+
+        fetch("/saveScore", {
+
             method:"POST",
-            headers:{"Content-Type":"application/json"},
-            body:JSON.stringify({username:currentUser,score:totalScore})
+
+            headers:{
+                "Content-Type":"application/json"
+            },
+
+            body:JSON.stringify({
+                username:currentUser,
+                score:totalScore
+            })
         });
     }
 }
 
 /* ================= QUESTIONS ================= */
 
-function generateQuestion(){
+function generateQuestion() {
 
-    let eq=document.querySelector(".eq");
-    let nums=[];
+    let eq =
+        document.querySelector(".eq");
 
-    if(currentLevel===1) nums=[rand(10),rand(10)];
-    if(currentLevel===2) nums=[rand(15),rand(15),rand(15)];
-    if(currentLevel===3) nums=[rand(20),rand(20),rand(20),rand(20)];
+    let nums = [];
 
-    if(currentType==="Sadd"){
-        currentAnswer = nums.reduce((a,b)=>a+b,0);
-        eq.innerText = nums.join("+")+"=";
+    if (currentLevel === 1)
+        nums = [rand(10), rand(10)];
+
+    if (currentLevel === 2)
+        nums = [rand(15), rand(15), rand(15)];
+
+    if (currentLevel === 3)
+        nums = [rand(20), rand(20), rand(20), rand(20)];
+
+    // ADDITION
+    if (currentType === "Sadd") {
+
+        currentAnswer =
+            nums.reduce((a,b)=>a+b,0);
+
+        eq.innerText =
+            nums.join(" + ") + " =";
     }
 
-    if(currentType==="Ssub"){
+    // SUBTRACTION
+    if (currentType === "Ssub") {
+
         nums.sort((a,b)=>b-a);
-        currentAnswer = nums.reduce((a,b)=>a-b);
-        eq.innerText = nums.join("-")+"=";
+
+        currentAnswer =
+            nums.reduce((a,b)=>a-b);
+
+        eq.innerText =
+            nums.join(" - ") + " =";
     }
 
-    if(currentType==="Smul"){
-        currentAnswer = nums.reduce((a,b)=>a*b,1);
-        eq.innerText = nums.join("×")+"=";
+    // MULTIPLICATION
+    if (currentType === "Smul") {
+
+        currentAnswer =
+            nums.reduce((a,b)=>a*b,1);
+
+        eq.innerText =
+            nums.join(" × ") + " =";
     }
 }
 
 /* ================= INPUT ================= */
 
-document.addEventListener("keydown",(e)=>{
+document.addEventListener("keydown", (e) => {
 
-    if(e.key==="Enter" && gameStarted){
+    if (e.key === "Enter" && gameStarted) {
 
-        let input=document.querySelector(".input");
+        let input =
+            document.querySelector(".input");
 
-        if(parseInt(input.value)===currentAnswer){
+        if (
+            parseInt(input.value)
+            === currentAnswer
+        ) {
+
             roundScore += getPoints();
         }
 
-        input.value="";
+        input.value = "";
+
         generateQuestion();
+
         updateHUD();
     }
 });

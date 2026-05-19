@@ -62,7 +62,6 @@ app.post("/login", (req, res) => {
         u => u.username === username
     );
 
-    // NO USER
     if (!user) {
 
         return res.json({
@@ -70,7 +69,6 @@ app.post("/login", (req, res) => {
         });
     }
 
-    // WRONG PASSWORD
     if (user.password !== password) {
 
         return res.json({
@@ -78,7 +76,6 @@ app.post("/login", (req, res) => {
         });
     }
 
-    // SUCCESS
     res.json({
 
         success: true,
@@ -102,7 +99,6 @@ app.post("/signup", (req, res) => {
         u => u.username === username
     );
 
-    // USER EXISTS
     if (exists) {
 
         return res.json({
@@ -110,7 +106,6 @@ app.post("/signup", (req, res) => {
         });
     }
 
-    // CREATE USER
     users.push({
 
         username: username,
@@ -140,7 +135,6 @@ app.post("/saveScore", (req, res) => {
         u => u.username === username
     );
 
-    // USER NOT FOUND
     if (!user) {
 
         return res.json({
@@ -148,7 +142,6 @@ app.post("/saveScore", (req, res) => {
         });
     }
 
-    // SAVE SCORE
     user.score = score;
 
     saveUsers(users);

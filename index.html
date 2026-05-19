@@ -15,51 +15,74 @@
 <div style="
     position:absolute;
     top:10px;
-    left:1150px;
+    left:20px;
     right:20px;
     display:flex;
-    justify-content:space-between;
+    justify-content:flex-end;
     align-items:center;
+    gap:15px;
 ">
 
     <button
-        onclick="openLeaderboard()"
-        style="
-            margin-right:15px;
-            font-size:16px;
-            padding:8px 14px;
-        ">
-            Leaderboard
+    onclick="openLeaderboard()"
+    style="
+        font-size:17px;
+        padding:10px 22px;
+        border:none;
+        border-radius:10px;
+        cursor:pointer;
+    ">
+        Leaderboard
     </button>
+
     <div id="userStatus" style="
         font-size:16px;
         background:#e0e0e0;
-        padding:8px 12px;
-        border-radius:8px;
+        padding:10px 18px;
+        border-radius:10px;
+        width:220px;
+        text-align:center;
     ">
         Not logged in
     </div>
 
-    <div style="display:flex; gap:10px; align-items:center;">
+    <button
+    onclick="openSignup()"
+    style="
+        font-size:18px;
+        padding:10px 26px;
+        border:none;
+        border-radius:10px;
+        cursor:pointer;
+        width:140px;
+    ">
+        Sign Up
+    </button>
 
-        <button onclick="openSignup()" style="font-size:18px;padding:10px 18px;">
-            Sign Up
-        </button>
+    <button
+    onclick="openLogin()"
+    style="
+        font-size:18px;
+        padding:10px 26px;
+        border:none;
+        border-radius:10px;
+        cursor:pointer;
+        width:140px;
+    ">
+        Log In
+    </button>
 
-        <button onclick="openLogin()" style="font-size:18px;padding:10px 18px;">
-            Log In
-        </button>
-
-        <div id="hud" style="
-            font-size:20px;
-            background:#cfcfcf;
-            padding:10px 15px;
-            border-radius:10px;
-        ">
-            Score: 0
-        </div>
-
+    <div id="hud" style="
+        font-size:20px;
+        background:#cfcfcf;
+        padding:10px 20px;
+        border-radius:10px;
+        min-width:160px;
+        text-align:center;
+    ">
+        Score: 0
     </div>
+
 </div>
 
 <!-- POPUP -->
@@ -96,7 +119,10 @@
         placeholder="Password"
         style="width:90%;padding:10px;margin:5px;">
 
-        <button id="popupButton"style="width:95%;padding:10px;margin-top:10px;">
+        <button
+        id="popupButton"
+        onclick="login()"
+        style="width:95%;padding:10px;margin-top:10px;">
             Login
         </button>
 
@@ -289,8 +315,11 @@ function openLogin() {
     document.getElementById("popupButton").innerText =
         "Login";
 
-    document.getElementById("popupButton").onclick =
-        login;
+    document.getElementById("popupButton")
+    .setAttribute(
+        "onclick",
+        "login()"
+    );
 
     document.getElementById("loginText").innerText = "";
 }
@@ -349,8 +378,11 @@ function openSignup() {
     document.getElementById("popupButton").innerText =
         "Sign Up";
 
-    document.getElementById("popupButton").onclick =
-        signUp;
+    document.getElementById("popupButton")
+    .setAttribute(
+        "onclick",
+        "signUp()"
+    );
 
     document.getElementById("loginText").innerText = "";
 }
@@ -492,17 +524,17 @@ function getRoundTime() {
 let chapters = [
 
     {
-        name:"Addition",
+        name:"Chapter 1: Addition",
         type:"Sadd"
     },
 
     {
-        name:"Subtraction",
+        name:"Chapter 2: Subtraction",
         type:"Ssub"
     },
 
     {
-        name:"Multiplication",
+        name:"Chapter 3: Multiplication",
         type:"Smul"
     }
 ];
@@ -717,6 +749,10 @@ document.addEventListener("keydown", (e) => {
         updateHUD();
     }
 });
+
+window.onerror = function(error) {
+    alert(error);
+}
 
 </script>
 

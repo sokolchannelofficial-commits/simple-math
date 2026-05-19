@@ -165,7 +165,11 @@ app.get("/leaderboard", (req, res) => {
     let users = loadUsers();
 
     let sorted = users
+
+        .filter(u => u.score > 0)
+
         .sort((a, b) => b.score - a.score)
+
         .slice(0, 10);
 
     res.json(sorted);

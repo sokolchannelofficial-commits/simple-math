@@ -22,6 +22,15 @@
     align-items:center;
 ">
 
+    <button
+        onclick="openLeaderboard()"
+        style="
+            margin-right:15px;
+            font-size:16px;
+            padding:8px 14px;
+        ">
+            Leaderboard
+    </button>
     <div id="userStatus" style="
         font-size:16px;
         background:#e0e0e0;
@@ -100,6 +109,51 @@
         <p id="loginText"></p>
 
     </div>
+</div>
+
+<!-- LEADERBOARD -->
+
+<div id="leaderboardPopup" style="
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.6);
+    display:none;
+    justify-content:center;
+    align-items:center;
+    z-index:9999;
+">
+
+    <div style="
+        background:white;
+        padding:30px;
+        border-radius:15px;
+        width:450px;
+        max-height:600px;
+        overflow-y:auto;
+    ">
+
+        <h2 style="margin-top:0;">
+            Leaderboard
+        </h2>
+
+        <div id="leaderboardContent">
+
+            Loading...
+
+        </div>
+
+        <button
+        onclick="closeLeaderboard()"
+        style="
+            width:100%;
+            padding:10px;
+            margin-top:20px;
+        ">
+            Close
+        </button>
+
+    </div>
+
 </div>
 
 <!-- FRAME -->
@@ -308,6 +362,84 @@ function closePopup() {
     document.getElementById("popup").style.display =
         "none";
 }
+
+/* ================= LEADERBOARD ================= */
+
+async function loadLeaderboard() {
+
+    let res = await fetch("/leaderboard");
+
+    let data = await res.json();
+
+    let html = "";
+
+    if (data.length <= 0) {
+
+        html = "No players yet.";
+    }
+
+    for (let i = 0; i < data.length; i++) {
+
+        let user = data[i];
+
+        html += `
+
+        <div style="
+            display:flex;
+            justify-content:space-between;
+            padding:8px;
+            border-bottom:1px solid #ccc;
+            font-size:20px;
+        ">
+
+            <span>
+                ${i + 1}. ${user.username}
+            </span>
+
+            <span>
+                ${user.score}
+            </span>
+
+        </div>
+        `;
+    }
+
+    document.getElementById(
+        "leaderboardContent"
+    ).innerHTML = html;
+}
+
+function openLeaderboard() {
+
+    document.getElementById(
+        "leaderboardPopup"
+    ).style.display = "flex";
+
+    loadLeaderboard();
+}
+
+function closeLeaderboard() {
+
+    document.getElementById(
+        "leaderboardPopup"
+    ).style.display = "none";
+}
+
+/* AUTO UPDATE */
+
+setInterval(() => {
+
+    let popup =
+        document.getElementById(
+            "leaderboardPopup"
+        );
+
+    if (popup.style.display === "flex") {
+
+        loadLeaderboard();
+    }
+
+}, 15000);
 
 /* ================= HUD ================= */
 

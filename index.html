@@ -79,7 +79,7 @@
         <input id="username" placeholder="Username" style="width:90%;padding:10px;margin:5px;">
         <input id="password" type="password" placeholder="Password" style="width:90%;padding:10px;margin:5px;">
 
-        <button id="popupButton" style="width:95%;padding:10px;margin-top:10px;" onclick="login()">
+        <<button id="popupButton" style="width:95%;padding:10px;margin-top:10px;">
             Login
         </button>
 
@@ -189,39 +189,33 @@ async function login() {
 function openLogin() {
 
     document.getElementById("popup").style.display = "flex";
+
+    document.getElementById("popupTitle").innerText =
+        "Login";
+
+    document.getElementById("popupButton").innerText =
+        "Login";
+
+    document.getElementById("popupButton").onclick =
+        login;
+
+    document.getElementById("loginText").innerText = "";
 }
 
-async function signUp() {
+function openSignup() {
 
-    let username = document.getElementById("username").value;
-    let password = document.getElementById("password").value;
+    document.getElementById("popup").style.display = "flex";
 
-    let res = await fetch("/signup", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            username,
-            password
-        })
-    });
+    document.getElementById("popupTitle").innerText =
+        "Sign Up";
 
-    let data = await res.json();
+    document.getElementById("popupButton").innerText =
+        "Sign Up";
 
-    if (data.error === "exists") {
+    document.getElementById("popupButton").onclick =
+        signUp;
 
-        document.getElementById("loginText").innerText =
-            "This username is already taken";
-
-        return;
-    }
-
-    if (data.success) {
-
-        document.getElementById("loginText").innerText =
-            "Account Created!";
-    }
+    document.getElementById("loginText").innerText = "";
 }
 
 function closePopup() {

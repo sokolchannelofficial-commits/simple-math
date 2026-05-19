@@ -8,11 +8,7 @@
 
     <title>Simple Math Game</title>
 
-    <link
-        rel="icon"
-        type="image/png"
-        href="icon.png"
-    >
+    <link rel="icon" type="image/png" href="/favicon.png">
 
 </head>
 
@@ -147,29 +143,35 @@ async function login() {
     let username = document.getElementById("username").value;
     let password = document.getElementById("password").value;
 
-    let res = await fetch("http://localhost:3000/login", {
+    let res = await fetch("/login", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password })
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            username,
+            password
+        })
     });
 
     let data = await res.json();
 
-    // ❌ нет аккаунта
     if (data.error === "no_user") {
+
         document.getElementById("loginText").innerText =
             "No Account with this Username created";
+
         return;
     }
 
-    // ❌ неправильный пароль
     if (data.error === "wrong_password") {
+
         document.getElementById("loginText").innerText =
             "Wrong Password";
+
         return;
     }
 
-    // ✅ успех
     if (data.success) {
 
         currentUser = data.username;
@@ -179,11 +181,13 @@ async function login() {
             "Logged in: " + currentUser;
 
         updateHUD();
+
         closePopup();
     }
 }
 
 function openLogin() {
+
     document.getElementById("popup").style.display = "flex";
 }
 
@@ -192,23 +196,29 @@ async function signUp() {
     let username = document.getElementById("username").value;
     let password = document.getElementById("password").value;
 
-    let res = await fetch("http://localhost:3000/signup", {
+    let res = await fetch("/signup", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password })
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            username,
+            password
+        })
     });
 
     let data = await res.json();
 
-    // ❌ уже существует
     if (data.error === "exists") {
+
         document.getElementById("loginText").innerText =
             "This username is already taken";
+
         return;
     }
 
-    // ✅ создан
     if (data.success) {
+
         document.getElementById("loginText").innerText =
             "Account Created!";
     }
@@ -331,7 +341,7 @@ function endGame(){
     updateHUD();
 
     if(currentUser){
-        fetch("http://localhost:3000/saveScore",{
+        fetch("",{
             method:"POST",
             headers:{"Content-Type":"application/json"},
             body:JSON.stringify({username:currentUser,score:totalScore})
